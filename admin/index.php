@@ -1,3 +1,15 @@
+<?php
+  
+  // 校验数据当前用户的箱子session有没有登录的登录标示
+  session_start();
+  if (empty($_SESSION['current_login_user'])) {
+     // 没有当前用户的登录信息，意味着该用户没有登录过
+     header('Location: /admin/login.php');
+  }
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>

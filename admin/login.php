@@ -1,6 +1,9 @@
 <?php 
 // 载入配置文件,此处只能用相对路径
 require_once '../config.php';
+// 开始session 找一个箱子，如果有就用之前的，没有给新的，同时返回钥匙
+session_start();
+
   function login(){
     // 1 接收并校验
     // 2 持久化
@@ -37,15 +40,10 @@ require_once '../config.php';
        $GLOBALS['error_message'] = '邮箱与密码不匹配';
        return;
     }
-    
-    // if ($email !== 'admin@qq.com') {
-    //   $GLOBALS['error_message'] = '邮箱与用户名不匹配';
-    //   return;
-    // }
-    // if ($password !== '123456') {
-    //   $GLOBALS['error_message'] = '邮箱与用户名不匹配';
-    //   return;
-    // }
+
+    // 存一个登录标识
+    // $_SESSION['is_logged_in'] = true;
+    $_SESSION['current_login_user'] = $user;
 
     // 一切OK
     header('Location: /admin/');
