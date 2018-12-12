@@ -1,4 +1,6 @@
 <?php 
+// 载入配置文件,此处只能用相对路径
+require_once '../config.php';
   function login(){
     // 1 接收并校验
     // 2 持久化
@@ -15,14 +17,35 @@
     $password = $_POST['password'];
 
     // 当客户端提交过来的完整的表单信息就应该对数据进行校验
-    if ($email !== 'admin@qq.com') {
-      $GLOBALS['error_message'] = '邮箱与用户名不匹配';
+    
+    $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    if (!$conn) {
+      exit('<h1>链接数据库失败</h1>');
+    }
+    $query = mysqli_query($conn,"select * from users where email = '{$email}' limit 1;");
+    if (!$query) {
+      $GLOBALS['error_message'] = '登录失败，请重试！';
       return;
     }
-    if ($password !== '123456') {
-      $GLOBALS['error_message'] = '邮箱与用户名不匹配';
+    $user = mysqli_fetch_assoc($query);
+    if (!$user) {
+      $GLOBALS['error_message'] = '邮箱与密码不匹配';
       return;
     }
+    // md5 加密
+    if ($user['password'] !== md5($password)) {
+       $GLOBALS['error_message'] = '邮箱与密码不匹配';
+       return;
+    }
+    
+    // if ($email !== 'admin@qq.com') {
+    //   $GLOBALS['error_message'] = '邮箱与用户名不匹配';
+    //   return;
+    // }
+    // if ($password !== '123456') {
+    //   $GLOBALS['error_message'] = '邮箱与用户名不匹配';
+    //   return;
+    // }
 
     // 一切OK
     header('Location: /admin/');
