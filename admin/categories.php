@@ -1,3 +1,41 @@
+<?php
+
+require_once '../functions.php';
+xiu_get_current_user();
+// 如果修改和查询在一个页面上，一定先修改再查询，----数据时效性
+function add_category(){
+  // 1 校验
+  // 2 持久化
+  // 3 响应
+  if (empty($_POST['name'])) {
+    $GLOBALS['success_message']=false;
+    $GLOBALS['error_message']='请填写名称!';
+    return;
+  }
+  if (empty($_POST['slug'])) {
+    $GLOBALS['success_message']=false;
+    $GLOBALS['error_message']='请填写slug!';
+    return;
+  }
+  
+  $GLOBALS['success_message']= $row <= 0;
+  $name = $_POST['name'];
+  $slug = $_POST['slug'];
+  $rows = xiu_execute("INSERT INTO categories VALUES(null, '{$slug}', '{$name}');");
+  
+  $GLOBALS['success_message']=$rows > 0;
+  $GLOBALS['error_message'] = $rows <= 0 ?'添加失败!' : '添加成功!';
+}
+if ($_SERVER['REQUEST_METHOD']==='POST') {//一旦表单提交请求则是添加数据 
+  add_category();
+  
+}
+
+// 查询全部分类信息
+$categories = xiu_fetch_all('select * from categories;');
+?>
+
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -19,12 +57,21 @@
         <h1>分类目录</h1>
       </div>
       <!-- 有错误信息时展示 -->
-      <!-- <div class="alert alert-danger">
-        <strong>错误！</strong>发生XXX错误
-      </div> -->
+      <?php if (isset($error_message)&&isset($success_message)) : ?>
+          <?php if ($success_message): ?>
+                  <div class="alert alert-success">
+                    <strong>成功！</strong><?php echo $error_message; ?>
+                  </div>
+          <?php else: ?>
+                  <div class="alert alert-danger">
+                    <strong>错误！</strong><?php echo $error_message; ?>
+                  </div>
+          <?php endif ?>
+      <?php endif ?>
+
       <div class="row">
         <div class="col-md-4">
-          <form>
+          <form action="<?php echo $_SERVER['PHP_SELF'];?>" method="post">
             <h2>添加新分类目录</h2>
             <div class="form-group">
               <label for="name">名称</label>
@@ -55,33 +102,17 @@
               </tr>
             </thead>
             <tbody>
+              <?php foreach ($categories as $item) : ?>
               <tr>
                 <td class="text-center"><input type="checkbox"></td>
-                <td>未分类</td>
-                <td>uncategorized</td>
+                <td><?php echo $item['name']; ?></td>
+                <td><?php echo $item['slug']; ?></td>
                 <td class="text-center">
                   <a href="javascript:;" class="btn btn-info btn-xs">编辑</a>
                   <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
                 </td>
               </tr>
-              <tr>
-                <td class="text-center"><input type="checkbox"></td>
-                <td>未分类</td>
-                <td>uncategorized</td>
-                <td class="text-center">
-                  <a href="javascript:;" class="btn btn-info btn-xs">编辑</a>
-                  <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-center"><input type="checkbox"></td>
-                <td>未分类</td>
-                <td>uncategorized</td>
-                <td class="text-center">
-                  <a href="javascript:;" class="btn btn-info btn-xs">编辑</a>
-                  <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
-                </td>
-              </tr>
+              <?php endforeach ?>
             </tbody>
           </table>
         </div>

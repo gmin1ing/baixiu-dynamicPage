@@ -54,3 +54,24 @@ function xiu_fetch_one($sql){// 获取单条数据
 	$res = xiu_fetch_all($sql);
 	return isset($res[0]) ? $res[0] : null;
 }
+
+
+
+/**
+ * 执行一个增删改语句
+ * @return 受影响函数
+ */
+function xiu_execute($sql){
+	$conn= mysqli_connect(XIU_DB_HOST, XIU_DB_USER, XIU_DB_PASSWORD, XIU_DB_NAME);
+	if (!$conn) {
+		exit('数据库连接失败');
+	}
+	$query = mysqli_query($conn, $sql);
+	if (!$query) {// 查询失败
+		return false;
+	}
+	// 对于增删改类的操作都是获取受影响的行数
+	$affected_rows = mysqli_affected_rows($conn);
+	mysqli_close($conn);
+	return $affected_rows;
+}
