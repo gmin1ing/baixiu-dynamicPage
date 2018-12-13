@@ -1,5 +1,63 @@
+<?php
+  require_once '../functions.php';
+  xiu_get_current_user();
+
+  
+  function add_user(){
+    if (empty($_POST['email']) || empty($_POST['slug']) || empty($_POST['nickname'])) {
+      $GLOBALS['error_message'] = '请完整填写表单内容';
+      $GLOBALS['success'] = false;
+      return;
+    }
+    $email = $_POST['email'];
+    $slug = $_POST['slug'];
+    $nickname = $_POST['nickname'];
+    $password = md5($_POST['password']);
+    $preg_email='/^[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*@([a-zA-Z0-9]+[-.])+([a-z]{2,5})$/ims';
+    if (preg_match($preg_email,$email) < 1) {
+      $GLOBALS['error_message'] = '邮箱格式不正确！';
+      $GLOBALS['success'] = false;
+      return;
+    }
+    $affect = xiu_execute("INSERT INTO users VALUES(null,'{$slug}','{$email}','{$password}','{$nickname}',null,null,'unactivated');");
+     $GLOBALS['error_message'] = $affect<=0 ? '添加失败' : '添加成功';
+     $GLOBALS['success'] = $affect >0;
+    
+  }
+
+
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    add_user();
+  }
+
+
+
+
+  $users = xiu_fetch_all("select * from users;");
+
+
+  function convert_status ($status) {
+      switch ($status) {
+        case 'unactivated':
+          return '未激活';
+        case 'activated':
+          return '已激活';
+        case 'forbidden':
+          return '禁止';
+        case 'trashed':
+          return '回收站';
+        default:
+          return '未知';
+      }
+  }
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="zh-CN">
+<head>
+<head>
 <head>
   <meta charset="utf-8">
   <title>Users &laquo; Admin</title>
@@ -19,12 +77,22 @@
         <h1>用户</h1>
       </div>
       <!-- 有错误信息时展示 -->
-      <!-- <div class="alert alert-danger">
-        <strong>错误！</strong>发生XXX错误
-      </div> -->
+      <?php if (isset($GLOBALS['error_message'])&&isset($GLOBALS['success'])): ?>
+          <?php if ($GLOBALS['success']) : ?>
+              <div class="alert alert-success">
+                <strong>成功！</strong><?php echo $error_message; ?>
+              </div>
+          <?php else: ?>
+              <div class="alert alert-danger">
+                <strong>错误！</strong><?php echo $error_message; ?>
+              </div>
+          <?php endif ?>
+      <?php endif ?>
+      
+      <?php?>
       <div class="row">
         <div class="col-md-4">
-          <form>
+          <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" novalidate autocompleted="off">
             <h2>添加新用户</h2>
             <div class="form-group">
               <label for="email">邮箱</label>
@@ -51,7 +119,7 @@
         <div class="col-md-8">
           <div class="page-action">
             <!-- show when multiple checked -->
-            <a class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
+            <a id="btn_delete_all" class="btn btn-danger btn-sm" href="/admin/users-delete.php" style="display: none">批量删除</a>
           </div>
           <table class="table table-striped table-bordered table-hover">
             <thead>
@@ -66,42 +134,20 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td class="text-center"><input type="checkbox"></td>
-                <td class="text-center"><img class="avatar" src="/static/assets/img/default.png"></td>
-                <td>i@zce.me</td>
-                <td>zce</td>
-                <td>汪磊</td>
-                <td>激活</td>
-                <td class="text-center">
-                  <a href="post-add.php" class="btn btn-default btn-xs">编辑</a>
-                  <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-center"><input type="checkbox"></td>
-                <td class="text-center"><img class="avatar" src="/static/assets/img/default.png"></td>
-                <td>i@zce.me</td>
-                <td>zce</td>
-                <td>汪磊</td>
-                <td>激活</td>
-                <td class="text-center">
-                  <a href="post-add.php" class="btn btn-default btn-xs">编辑</a>
-                  <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-center"><input type="checkbox"></td>
-                <td class="text-center"><img class="avatar" src="/static/assets/img/default.png"></td>
-                <td>i@zce.me</td>
-                <td>zce</td>
-                <td>汪磊</td>
-                <td>激活</td>
-                <td class="text-center">
-                  <a href="post-add.php" class="btn btn-default btn-xs">编辑</a>
-                  <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
-                </td>
-              </tr>
+              <?php foreach ($users as $item) : ?>
+                <tr>
+                  <td class="text-center"><input type="checkbox" data-id="<?php echo $item['id']; ?>"></td>
+                  <td class="text-center"><img class="avatar" src="<?php echo $item['avatar']?$item['avatar']:'/static/uploads/avatar.jpg'; ?>"></td>
+                  <td><?php echo $item['email']; ?></td>
+                  <td><?php echo $item['slug']; ?></td>
+                  <td><?php echo $item['nickname']; ?></td>
+                  <td><?php echo convert_status($item['status']); ?></td>
+                  <td class="text-center">
+                    <a href="post-add.php" class="btn btn-default btn-xs">编辑</a>
+                    <a href="/admin/users-delete.php?id='<?php echo $item['id']; ?>'" class="btn btn-danger btn-xs">删除</a>
+                  </td> 
+                </tr>
+              <?php endforeach ?>
             </tbody>
           </table>
         </div>
@@ -115,5 +161,26 @@
   <script src="/static/assets/vendors/jquery/jquery.js"></script>
   <script src="/static/assets/vendors/bootstrap/js/bootstrap.js"></script>
   <script>NProgress.done()</script>
+  <script>
+      $(function(){
+        var $allCheckbox = $('tbody input');
+        var $delteButton = $('#btn_delete_all');
+        var allCheckeds = [];
+        $allCheckbox.on('change',function(){
+            var id = $(this).data('id');
+            if ($(this).prop('checked')) {
+              allCheckeds.push(id);
+            } else {
+              allCheckeds.splice(allCheckeds.indexOf(id),1);
+            }
+            allCheckeds.length ? $delteButton.fadeIn() : $delteButton.fadeOut();
+
+            $delteButton.prop('search','?id='+allCheckeds);
+        });
+      });
+
+     
+  </script>
+  
 </body>
 </html>
