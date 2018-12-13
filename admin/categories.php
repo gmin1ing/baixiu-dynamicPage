@@ -90,7 +90,7 @@ $categories = xiu_fetch_all('select * from categories;');
         <div class="col-md-8">
           <div class="page-action">
             <!-- show when multiple checked -->
-            <a class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
+            <a id='btn_delete' class="btn btn-danger btn-sm" href="/admin/category-delete.php" style="display: none">批量删除</a>
           </div>
           <table class="table table-striped table-bordered table-hover">
             <thead>
@@ -104,7 +104,7 @@ $categories = xiu_fetch_all('select * from categories;');
             <tbody>
               <?php foreach ($categories as $item) : ?>
               <tr>
-                <td class="text-center"><input type="checkbox"></td>
+                <td class="text-center"><input type="checkbox" data-id="<?php echo $item['id']; ?>"></td>
                 <td><?php echo $item['name']; ?></td>
                 <td><?php echo $item['slug']; ?></td>
                 <td class="text-center">
@@ -126,5 +126,59 @@ $categories = xiu_fetch_all('select * from categories;');
   <script src="/static/assets/vendors/jquery/jquery.js"></script>
   <script src="/static/assets/vendors/bootstrap/js/bootstrap.js"></script>
   <script>NProgress.done()</script>
+  <script>
+    $(function($){
+                // this.dataset['id']
+                // console.log($(this).attr('data-id'));
+                // console.log($(this).attr('data-id'));
+                // data属性可以获取自定义属性
+                // console.log($(this).data("id"));
+          var $tbodyCheckboxs = $('tbody input');
+          var $btnDelete = $('#btn_delete');
+          var allCheckeds = [];// 记录当前选中元素
+
+          $tbodyCheckboxs.on('change',function(){
+            var id = $(this).data("id");
+            if ($(this).prop('checked')) {
+                allCheckeds.push(id);      
+            }else {
+              allCheckeds.splice(allCheckeds.indexOf(id),1);
+            }
+
+            allCheckeds.length ? $btnDelete.fadeIn() : $btnDelete.fadeOut();
+            // console.log(allCheckeds);
+            // $btnDelete.attr('href','/admin/category-delete.php?id='+allCheckeds);
+            $btnDelete.prop('search','?id='+allCheckeds);
+          });
+      });
+
+
+
+          // attr 和 prop 区别： 
+          // - attr访问到的是元素属性
+          // - prop访问的是元素对应的DOM对象的属性
+    // 1 不要重复使用无意义的选择操作，应该采用变量本地化
+    // $(function($){
+    //   // 变量本地化
+    //   var $tbodyCheckboxs = $('tbody input');
+    //   var $btnDelete = $('#btn_delete');
+
+    //   $tbodyCheckboxs.on('change',function(){
+    //       var flag = false;
+    //       $tbodyCheckboxs.each(function(i, item){
+    //         if($(item).prop('checked')){
+    //           flag = true;
+    //         }
+    //       });
+    //       flag ? $btnDelete.fadeIn(): $btnDelete.fadeOut();
+    //     });
+    //   });
+    //   
+    //   
+              
+
+
+   
+  </script>
 </body>
 </html>
