@@ -25,7 +25,7 @@ function add_category(){
   
   $GLOBALS['success_message']=$rows > 0;
   $GLOBALS['error_message'] = $rows <= 0 ?'添加失败!' : '添加成功!';
-}
+};
 if ($_SERVER['REQUEST_METHOD']==='POST') {//一旦表单提交请求则是添加数据 
   add_category();
   
@@ -109,7 +109,7 @@ $categories = xiu_fetch_all('select * from categories;');
                 <td><?php echo $item['slug']; ?></td>
                 <td class="text-center">
                   <a href="javascript:;" class="btn btn-info btn-xs">编辑</a>
-                  <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+                  <a href="category-delete.php?id='<?php echo $item['id']; ?>'" class="btn btn-danger btn-xs">删除</a>
                 </td>
               </tr>
               <?php endforeach ?>
