@@ -88,6 +88,34 @@ session_start();
       </div>
       <button class="btn btn-primary btn-block">登 录</button>
     </form>
+    <script src="/static/assets/vendors/jquery/jquery.js"></script>
+    <script>
+      $(function($){
+        // 单独作用域，确保页面加载后执行
+        // todo: 确保在用户输入自己的邮箱过后，页面上展示这个邮箱对应的头像
+        // 实现： 
+        // - 在邮箱文本框失去焦点时 
+        // - 获取邮箱对应的头像地址，展示到上面的img元素上
+        var emailFormat = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+$/;
+        $('#email').on('blur',function(){
+          var value = $(this).val();
+          // emailFormat.exec(value)
+          // 忽略文本框为空或者不是一个邮箱
+          if (!value || !emailFormat.test(value)) return;
+          // 用户输入的是合理的邮箱地址 // - 获取邮箱对应的头像地址，展示到上面的img元素上
+          // 因为客户端的JS无法直接操作数据库，因此需要通过 JS 发送 AJAX 请求告诉服务端的某个接口，让服务端的接口帮助获取头像地址
+          $.get('/admin/api/avatar.php', { email : value }, function(res){// 希望res => 这个邮箱对应的头像地址展示到上面的img 元素上
+            if(!res) return;
+            // $('.avatar').fadeOut().attr('src',res).fadeIn();
+            $('.avatar').fadeOut(function(){//淡出的回调函数
+              $(this).on('load',function(){//在淡出完成后确保图片完全加载完成过后
+                $(this).fadeIn();
+              }).attr('src',res);
+            });
+          });
+        });
+      });
+    </script>
   </div>
 </body>
 </html>
