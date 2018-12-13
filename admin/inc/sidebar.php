@@ -1,12 +1,24 @@
 <!-- $_SERVER['PHP_SELF'] 可以取代 $current_page -->
 
-<?php $current_page = isset($current_page)?$current_page:''; ?>
+<?php 
+// 写相对路径会有问题，随着被载入的文件的路径变化会不同
+// sidebar.php 是被 index.php 载入执行的，相对路径是相对于 index.php 的，因此此处不因该使用相对路径，应该使用物理路径
+// require_once '../../functions.php';
+require_once dirname(__FILE__).'/../../functions.php';
+
+$current_page = isset($current_page) ? $current_page : ''; 
+$current_user = xiu_get_current_user();
+
+// session_start();
+// $current_user = $_SESSION['current_login_user'];
+
+?>
 
 
 <div class="aside">
     <div class="profile">
-      <img class="avatar" src="/static/uploads/avatar.jpg">
-      <h3 class="name">布头儿</h3>
+      <img class="avatar" src="<?php echo $current_user['avatar']; ?>">
+      <h3 class="name"><?php echo $current_user['nickname']; ?></h3>
     </div>
     <ul class="nav">
       <li <?php echo $current_page==='index'?'class="active"':'' ?>>

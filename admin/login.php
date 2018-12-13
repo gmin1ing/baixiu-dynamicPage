@@ -21,7 +21,7 @@ session_start();
 
     // 当客户端提交过来的完整的表单信息就应该对数据进行校验
     
-    $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    $conn = mysqli_connect(XIU_DB_HOST, XIU_DB_USER, XIU_DB_PASSWORD, XIU_DB_NAME);
     if (!$conn) {
       exit('<h1>链接数据库失败</h1>');
     }
@@ -43,7 +43,9 @@ session_start();
 
     // 存一个登录标识
     // $_SESSION['is_logged_in'] = true;
+    // 为了后续可以直接获取当前用户的登录信息，此处直接将用户信息存在session中
     $_SESSION['current_login_user'] = $user;
+    // $_SESSION['current_login_user_id'] = $user['id'];
 
     // 一切OK
     header('Location: /admin/');
