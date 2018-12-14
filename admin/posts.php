@@ -18,13 +18,17 @@ if ($page <1 ) {
 // ========== 分类筛选 ====================
 
 $where = '1 = 1';
+$search = '';
 if (isset($_GET['category']) && $_GET['category']!== 'all') {
   $where .= ' and posts.category_id ='.$_GET['category'];
+  $search .= '&category=' . $_GET['category'];
 }
 
 if (isset($_GET['state'])&&$_GET['state']!=='all') {
   $where .=" and posts.status = '{$_GET['state']}'";
+  $search .= '&state=' . $_GET['state'];
 }
+
 
 
 
@@ -38,9 +42,6 @@ $total_page = (int)ceil($total_count/$size);
 if ($page > $total_page ) {
   header('Location: /admin/posts.php?page='.$total_page);
 }
-
-
-
 
 
 // 获取全部数据
@@ -183,13 +184,13 @@ function convert_status ($status) {
           <button class="btn btn-default btn-sm">筛选</button>
         </form>
         <ul class="pagination pagination-sm pull-right">
-          <li><a href="?page=<?php echo $last_page; ?>">上一页</a></li>
+          <li><a href="?page=<?php echo $last_page.$search; ?>">上一页</a></li>
 
           <?php for($i = $begin; $i <= $end; $i++): ?>
-          <li <?php echo $i === $page ? 'class = "active"' : ''; ?> ><a href="?page=<?php echo $i; ?>"><?php echo $i; ?></a></li>
+          <li <?php echo $i === $page ? 'class = "active"' : ''; ?> ><a href="?page=<?php echo $i.$search ; ?>"><?php echo $i; ?></a></li>
           <?php endfor ?>
 
-          <li><a href="?page=<?php echo $next_page; ?>">下一页</a></li>
+          <li><a href="?page=<?php echo $next_page.$search; ?>">下一页</a></li>
         </ul>
       </div>
       <table class="table table-striped table-bordered table-hover">
