@@ -4,6 +4,8 @@ require_once '../functions.php';
 xiu_get_current_user();
 // $posts = xiu_fetch_all('select * from posts;');
 
+
+
 // 处理分页参数
 $size = 50;
 $page = empty($_GET['page'])? 1 : (int)$_GET['page'];
@@ -12,34 +14,54 @@ if ($page <1 ) {
   header('Location: /admin/posts.php?page=1');
 }
 
-$total_count = xiu_fetch_one('Select count(1) as total from posts
+
+// ========== 分类筛选 ====================
+
+$where = '1 = 1';
+if (isset($_GET['category']) && $_GET['category']!== 'all') {
+  $where .= ' and posts.category_id ='.$_GET['category'];
+}
+
+if (isset($_GET['state'])&&$_GET['state']!=='all') {
+  $where .=" and posts.status = '{$_GET['state']}'";
+}
+
+
+
+$total_count = xiu_fetch_one("Select count(1) as total from posts
                 INNER JOIN users ON posts.user_id = users.id
-                INNER JOIN categories ON posts.category_id = categories.id')['total'];
+                INNER JOIN categories ON posts.category_id = categories.id
+                WHERE {$where}
+                ")['total'];
 $total_page = (int)ceil($total_count/$size);
 
 if ($page > $total_page ) {
   header('Location: /admin/posts.php?page='.$total_page);
 }
 
-$offset = ($page -1) * $size;
 
 
 
 
 // 获取全部数据
 //=================================
+$offset = ($page -1) * $size;
+
 $posts = xiu_fetch_all("Select 
   posts.id,
   posts.title,
   users.nickname AS user_name,
-  categories.`name` AS category_name,
+  categories.name AS category_name,
   posts.created,
-  posts.`status`
+  posts.status
 FROM posts 
 INNER JOIN users ON posts.user_id = users.id
 INNER JOIN categories ON posts.category_id = categories.id
+where {$where}
 order by posts.created desc
 limit {$offset},{$size}");
+
+$categories = xiu_fetch_all('select * from categories;');
 
 // 处理分页页码
 // =================================
@@ -74,6 +96,10 @@ $next_page = ($page + 1) > $total_page ? $total_page : $page + 1;
 // $region = ($visiables-1)/2; // 左右区间
 // $begin = ($page - $region) <1 ? 1 : $page - $region;
 // $end = ($begin + $visiables -1) > $total_page ? $total_page : $begin + $visiables -1;
+
+
+
+
 
 
 
@@ -139,15 +165,20 @@ function convert_status ($status) {
       <div class="page-action">
         <!-- show when multiple checked -->
         <a class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
-        <form class="form-inline">
-          <select name="" class="form-control input-sm">
-            <option value="">所有分类</option>
-            <option value="">未分类</option>
+        <form class="form-inline" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+
+          <select name="category" class="form-control input-sm">
+            <option value="all">所有分类</option>
+            <?php foreach ($categories as $item):?>
+            <option value="<?php echo $item['id']; ?>" <?php echo isset($_GET['category']) && $_GET['category']=== $item['id'] ? 'selected': ''; ?> ><?php echo $item['name']; ?></option>
+            <?php endforeach ?>
           </select>
-          <select name="" class="form-control input-sm">
-            <option value="">所有状态</option>
-            <option value="">草稿</option>
-            <option value="">已发布</option>
+
+          <select name="state" post-add.php" class="form-control input-sm">
+            <option value="all" <?php echo isset($_GET['state'])&&$_GET['state']==='all' ? 'selected':''; ?> >所有状态</option>
+            <option value="drafted" <?php echo isset($_GET['state'])&&$_GET['state']==='drafted' ? 'selected':''; ?> >草稿</option>
+            <option value="published" <?php echo isset($_GET['state'])&&$_GET['state']==='published' ? 'selected':''; ?> >已发布</option>
+            <option value="trashed" <?php echo isset($_GET['state'])&&$_GET['state']==='trashed' ? 'selected':''; ?> >回收站</option>
           </select>
           <button class="btn btn-default btn-sm">筛选</button>
         </form>

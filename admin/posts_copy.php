@@ -64,6 +64,10 @@ $next_page = ($page + 1) > $total_page ? $total_page : $page + 1;
 // $end = ($begin + $visiables -1) > $total_page ? $total_page : $begin + $visiables -1;
 
 
+// ========== 分类筛选 ====================
+$categories = $xiu_fetch_all('select * from categories;');
+
+
 
 
 //===================================================================
@@ -127,10 +131,14 @@ function convert_status ($status) {
       <div class="page-action">
         <!-- show when multiple checked -->
         <a class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
-        <form class="form-inline">
+        <form class="form-inline" action="<?php $_SERVER['PHP_SELF']; ?>">
           <select name="" class="form-control input-sm">
             <option value="">所有分类</option>
-            <option value="">未分类</option>
+
+            <?php foreach ($categories as $item):?>
+            <option value=""><?php echo $item['name']; ?></option>
+            <?php endforeach ?>
+
           </select>
           <select name="" class="form-control input-sm">
             <option value="">所有状态</option>
