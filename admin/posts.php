@@ -4,17 +4,6 @@ require_once '../functions.php';
 xiu_get_current_user();
 // $posts = xiu_fetch_all('select * from posts;');
 
-
-
-// 处理分页参数
-$size = 50;
-$page = empty($_GET['page'])? 1 : (int)$_GET['page'];
-// $page = $page < 1 ? 1 : $page;
-if ($page <1 ) {
-  header('Location: /admin/posts.php?page=1');
-}
-
-
 // ========== 分类筛选 ====================
 
 $where = '1 = 1';
@@ -30,7 +19,13 @@ if (isset($_GET['state'])&&$_GET['state']!=='all') {
 }
 
 
-
+// ===============处理分页参数=================
+$size = 50;
+$page = empty($_GET['page'])? 1 : (int)$_GET['page'];
+// $page = $page < 1 ? 1 : $page;
+if ($page <1 ) {
+  header('Location: /admin/posts.php?page=1'.$search);
+}
 
 $total_count = xiu_fetch_one("Select count(1) as total from posts
                 INNER JOIN users ON posts.user_id = users.id
@@ -40,7 +35,7 @@ $total_count = xiu_fetch_one("Select count(1) as total from posts
 $total_page = (int)ceil($total_count/$size);
 
 if ($page > $total_page ) {
-  header('Location: /admin/posts.php?page='.$total_page);
+  header('Location: /admin/posts.php?page='.$total_page.$search);
 }
 
 
@@ -218,7 +213,7 @@ function convert_status ($status) {
             <td class="text-center"><?php echo convert_status($item['status']); ?></td>
             <td class="text-center">
               <a href="javascript:;" class="btn btn-default btn-xs">编辑</a>
-              <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+              <a href="/admin/posts-delete.php?id=<?php echo $item['id']; ?>" class="btn btn-danger btn-xs">删除</a>
             </td>
           </tr>
           <?php endforeach ?>
