@@ -5,25 +5,10 @@ xiu_get_current_user();
 // $posts = xiu_fetch_all('select * from posts;');
 
 // 处理分页参数
-$size = 50;
+
 $page = empty($_GET['page'])? 1 : (int)$_GET['page'];
-// $page = $page < 1 ? 1 : $page;
-if ($page <1 ) {
-  header('Location: /admin/posts.php?page=1');
-}
-
-$total_count = xiu_fetch_one('Select count(1) as total from posts
-                INNER JOIN users ON posts.user_id = users.id
-                INNER JOIN categories ON posts.category_id = categories.id')['total'];
-$total_page = (int)ceil($total_count/$size);
-
-if ($page > $total_page ) {
-  header('Location: /admin/posts.php?page='.$total_page);
-}
-
+$size = 50;
 $offset = ($page -1) * $size;
-
-
 
 
 // 获取全部数据
@@ -44,7 +29,10 @@ limit {$offset},{$size}");
 // 处理分页页码
 // =================================
 // 求出最大页面
-
+$total_count = xiu_fetch_one('Select count(1) as total from posts
+                INNER JOIN users ON posts.user_id = users.id
+                INNER JOIN categories ON posts.category_id = categories.id')['total'];
+$total_page = (int)ceil($total_count/$size);
 
 $visiables = 5;
 $region = (int)floor($visiables/2); // 左右区间
