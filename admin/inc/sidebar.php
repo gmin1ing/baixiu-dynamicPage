@@ -6,6 +6,7 @@
 // require_once '../../functions.php';
 require_once dirname(__FILE__).'/../../functions.php';
 
+
 $current_page = isset($current_page) ? $current_page : ''; 
 $current_user = xiu_get_current_user();
 
