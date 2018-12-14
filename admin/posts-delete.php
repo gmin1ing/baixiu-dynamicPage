@@ -17,4 +17,5 @@ $id = $_GET['id'];
 
 $rows = xiu_execute('DELETE FROM posts WHERE id in ('.$id.');');	
 // if ($rows>0) {}
+// http 中的 referer 用来识别页面当前请求的来源
 header('Location: '.$_SERVER['HTTP_REFERER']);
