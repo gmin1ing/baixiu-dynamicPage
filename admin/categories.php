@@ -34,6 +34,9 @@ function add_category(){//新增数据
 function edit_category(){//更新数据
   global $current_edit_category;
   $id = $current_edit_category['id'];
+  // $name = $current_edit_category['name'];
+  // $slug = $current_edit_category['slug'];
+
   $name = empty($_POST['name']) ? $current_edit_category['name'] : $_POST['name'];
   $current_edit_category['name'] = $name;
   $slug = empty($_POST['slug']) ? $current_edit_category['slug'] : $_POST['slug'];
@@ -45,6 +48,17 @@ function edit_category(){//更新数据
   $GLOBALS['error_message'] = $rows <= 0 ?'更新失败!' : '更新成功!';
 
 }
+
+
+
+// if ($_SERVER['REQUEST_METHOD']==='POST'){
+//     if (empty($_GET['id'])) {
+//       add_category();
+//     }else {
+//       $current_edit_category = xiu_fetch_one('select * from categories where id = '.$_GET['id']);
+//       edit_category();
+//     }
+// }
 
 
 
@@ -127,7 +141,7 @@ $categories = xiu_fetch_all('select * from categories;');
                   <div class="form-group">
                     <label for="slug">别名</label>
                     <input id="slug" class="form-control" name="slug" type="text" placeholder="slug" value="<?php echo $current_edit_category['slug']; ?>">
-                    <p class="help-block">https://zce.me/category/<strong>slug</strong></p>
+                    <p class="help-block">https://me/category/<strong>slug</strong></p>
                   </div>
                   <div class="form-group">
                     <button class="btn btn-primary" type="submit">保存</button>
