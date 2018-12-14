@@ -215,11 +215,13 @@ $categories = xiu_fetch_all('select * from categories;');
           var $tbodyCheckboxs = $('tbody input');
           var $btnDelete = $('#btn_delete');
           var allCheckeds = [];// 记录当前选中元素
+          var $theadCheckbox = $('thead input');
 
           $tbodyCheckboxs.on('change',function(){
             var id = $(this).data("id");
             if ($(this).prop('checked')) {
-                allCheckeds.push(id);      
+              // allCheckeds.indexOf(id) === -1 || allCheckeds.push(id); 
+              allCheckeds.includes(id) || allCheckeds.push(id); 
             }else {
               allCheckeds.splice(allCheckeds.indexOf(id),1);
             }
@@ -229,6 +231,14 @@ $categories = xiu_fetch_all('select * from categories;');
             // $btnDelete.attr('href','/admin/category-delete.php?id='+allCheckeds);
             $btnDelete.prop('search','?id='+allCheckeds);
           });
+
+          //全选和全不选
+          $theadCheckbox.on('change',function(){
+            var checked = $(this).prop('checked');
+            // $tbodyCheckboxs.prop('checked',checked).change();
+            $tbodyCheckboxs.prop('checked',checked).trigger('change');
+          })
+
       });
 
 
