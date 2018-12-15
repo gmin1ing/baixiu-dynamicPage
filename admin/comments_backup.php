@@ -83,7 +83,7 @@ xiu_get_current_user();
         <tr {{if status === 'rejected'}} class="danger" 
             {{else status === 'held'}} class="warning"
             {{else}} class="success"
-        {{/if}} data-id="{{:id}}"  >  
+        {{/if}} >  
             <td class="text-center"><input type="checkbox"></td>
             <td>{{:author}}</td>
             <td>{{:content}}</td>
@@ -100,7 +100,7 @@ xiu_get_current_user();
                 <a href="javascript:;" class="btn btn-info btn-xs">批准</a>
                 <a href="javascript:;" class="btn btn-warning btn-xs">拒绝</a>
               {{/if}}
-                <a href="javascript:;" class="btn btn-danger btn-xs btn-delete" >删除</a>
+                <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
             </td>
           </tr>
       {{/for}}
@@ -142,7 +142,6 @@ xiu_get_current_user();
        $('tbody').fadeOut();
         // ========== 通过AJAX的方式发送请求---获取列表所需先数据 ==================
        $.getJSON('/admin/api/comments.php', { page : page }, function(result) {
-          // 分页显示
           $('.pagination').twbsPagination({// 第一个初始化时就会触发
             // first: '&laquo;',
             // last: '&raquo;',
@@ -156,7 +155,6 @@ xiu_get_current_user();
                 loadPageData(page);
             }
           });
-          // 渲染数据
           var html = $('#comments_temp').render({
             comments: result.comments,
           });
@@ -165,18 +163,6 @@ xiu_get_current_user();
     }
 
     loadPageData(1);
-
-    // ============ 删除功能 =========
-    // 由于删除按钮时动态添加的，而且执行动态添加的代码是在此之后的，过早注册了事件，注册不上-----使用委托事件
-    $('tbody').on('click','.btn-delete',function(){
-      // 1 获取删除数据的ID
-      var id = $(this).parent().parent().data('id');
-      // 2 发送AJAX请求
-      $.get('/admin/api/comment-delete.php',{ id : id },function(res){
-        console.log(res);
-      });
-      // 3 根据服务端的返回数据决定是否移除这个数据
-    });
     
     
   </script>
