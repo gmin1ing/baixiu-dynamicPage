@@ -1,5 +1,11 @@
 <?php
-require_once '../config.php';
+// require_once 'config.php';
+
+require_once dirname(__FILE__).'/config.php';
+
+
+// 
+// require_once dirname(__FILE__).'/../../functions.php';
 /**
  * 封装公用的函数
  * 
@@ -37,6 +43,8 @@ function xiu_fetch_all($sql){// 获取多条数据
 	if (!$query) {// 查询失败
 		return false;
 	}
+	$result=[];
+
 	while ($row = mysqli_fetch_assoc($query)) {
 		$result[]= $row;
 	}

@@ -20,7 +20,7 @@ if (isset($_GET['state'])&&$_GET['state']!=='all') {
 
 
 // ===============处理分页参数=================
-$size = 50;
+$size = 20;
 $page = empty($_GET['page'])? 1 : (int)$_GET['page'];
 // $page = $page < 1 ? 1 : $page;
 if ($page <1 ) {
@@ -160,7 +160,7 @@ function convert_status ($status) {
       </div> -->
       <div class="page-action">
         <!-- show when multiple checked -->
-        <a class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
+        <a id="btn_delete" class="btn btn-danger btn-sm" href="/admin/posts-delete.php" style="display: none">批量删除</a>
         <form class="form-inline" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 
           <select name="category" class="form-control input-sm">
@@ -168,6 +168,7 @@ function convert_status ($status) {
             <?php foreach ($categories as $item):?>
             <option value="<?php echo $item['id']; ?>" <?php echo isset($_GET['category']) && $_GET['category']=== $item['id'] ? 'selected': ''; ?> ><?php echo $item['name']; ?></option>
             <?php endforeach ?>
+
           </select>
 
           <select name="state" post-add.php" class="form-control input-sm">
@@ -203,7 +204,7 @@ function convert_status ($status) {
         <tbody>
           <?php foreach ($posts as $item): ?>
           <tr>
-            <td class="text-center"><input type="checkbox"></td>
+            <td class="text-center"><input type="checkbox" data-id="<?php echo $item['id']; ?>"></td>
             <td><?php echo $item['title']; ?></td>
            <!--  <td><?php //echo get_users($item['user_id']); ?></td>
             <td><?php //echo get_category($item['category_id']); ?></td> -->
@@ -229,5 +230,30 @@ function convert_status ($status) {
   <script src="/static/assets/vendors/jquery/jquery.js"></script>
   <script src="/static/assets/vendors/bootstrap/js/bootstrap.js"></script>
   <script>NProgress.done()</script>
+  <script>
+    $(function ($){
+      var $btnDelete = $('#btn_delete');
+      var $tbodyInput = $('tbody input');
+      var $theadInput = $('thead input');
+      var selectAll = [];
+      $tbodyInput.on('change',function(){
+          var id = $(this).data('id');
+          if ($(this).prop('checked')) {
+            selectAll.includes(id) || selectAll.push(id);
+          } else {
+            selectAll.splice(selectAll.indexOf(id),1);
+          }
+          console.log(selectAll);
+          selectAll.length ?  $btnDelete.fadeIn() : $btnDelete.fadeOut();
+          $btnDelete.prop('search','?id='+selectAll);
+      });
+      $theadInput.on('change',function(){
+          var checked = $(this).prop('checked');
+          $tbodyInput.prop('checked',checked).trigger('change');
+      });
+    });
+
+   
+  </script>
 </body>
 </html>
