@@ -138,11 +138,18 @@ xiu_get_current_user();
     // });
 
     // load 结合分页
+    var currentPage = 1;
+
     function loadPageData(page){
        $('tbody').fadeOut();
         // ========== 通过AJAX的方式发送请求---获取列表所需先数据 ==================
        $.getJSON('/admin/api/comments.php', { page : page }, function(result) {
+          if (page > result.total_pages) {
+            loadPageData(result.total_pages);
+            return;
+          }
           // 分页显示
+          $('.pagination').twbsPagination('destroy');
           $('.pagination').twbsPagination({// 第一个初始化时就会触发
             // first: '&laquo;',
             // last: '&raquo;',
@@ -150,32 +157,55 @@ xiu_get_current_user();
             last: '&gt;&gt;',
             prev: '&lt;',
             next : '&gt;',
+            startPage : page,
             totalPages: result.total_pages,
             visiblePages: 5,
+            initiateStartPageClick: false,
             onPageClick: function(e, page){
                 loadPageData(page);
             }
           });
           // 渲染数据
-          var html = $('#comments_temp').render({
-            comments: result.comments,
-          });
+          var html = $('#comments_temp').render({ comments: result.comments });
           $('tbody').html(html).fadeIn();
+          currentPage = page;
       });
+      
     }
 
-    loadPageData(1);
+    // $('.pagination').twbsPagination({// 第一个初始化时就会触发
+    //         // first: '&laquo;',
+    //         // last: '&raquo;',
+    //         first: '&lt;&lt;',
+    //         last: '&gt;&gt;',
+    //         prev: '&lt;',
+    //         next : '&gt;',
+    //         totalPages: 100,
+    //         visiblePages: 5,
+    //         initiateStartPageClick: false,
+    //         onPageClick: function(e, page){
+    //             loadPageData(page);
+    //         }
+    // });
+
+   
+    loadPageData(currentPage);
 
     // ============ 删除功能 =========
     // 由于删除按钮时动态添加的，而且执行动态添加的代码是在此之后的，过早注册了事件，注册不上-----使用委托事件
     $('tbody').on('click','.btn-delete',function(){
       // 1 获取删除数据的ID
-      var id = $(this).parent().parent().data('id');
+      $tr = $(this).parent().parent();
+      var id = $tr.data('id');
       // 2 发送AJAX请求
       $.get('/admin/api/comment-delete.php',{ id : id },function(res){
-        console.log(res);
+        if(!res) return;
+        // 3 根据服务端的返回数据决定是否移除这个数据
+        // $tr.remove()
+        // 从新载入这一页的数据
+        loadPageData(currentPage);
       });
-      // 3 根据服务端的返回数据决定是否移除这个数据
+      
     });
     
     

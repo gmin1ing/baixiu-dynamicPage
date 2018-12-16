@@ -11,7 +11,7 @@ $total = xiu_fetch_one('select count(1) as total
 				from comments 
 				inner join posts on comments.post_id = posts.id;')['total'];
 $page = empty($_GET['page']) ? 1 : intval($_GET['page']);
-$length = 50;
+$length = 5;
 $offset = ($page - 1) * $length;
 $total_pages = ceil($total / $length);
 
